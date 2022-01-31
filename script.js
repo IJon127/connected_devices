@@ -1,18 +1,17 @@
-let portSelector;
 let glassSize;
 let waterVolume;
+let glassFinData;
+let glassArea;
 // variable for the serialport object:
+let portSelector;
 let serial;
-// previous state of the serial input from the button:
-let lastButtonState = 0;
 
 // this function is called when the page is loaded.
-// element event listeners are  added here:
 function setup(event) {
   glassSize = document.getElementById("container");
   glassSize.addEventListener("change", setGlassSize);
 
-  waterVolume = document.getElementById("fanSpeed");
+  waterVolume = document.getElementById("water");
   waterVolume.addEventListener("change", setWaterVolume);
 
   // initialize the serialport object:
@@ -21,34 +20,32 @@ function setup(event) {
   serial.on("data", serialEvent);
   serial.list(); // list the serial ports
 
-  //   setGlassSize();
-  //   setWaterVolume();
+  setGlassSize();
+  setWaterVolume();
 }
 
-function setGlassSize() {
-  // change its value, depending on its current value:
-  if (glassSize.value == "on") {
-    glassSize.value = "off";
-  } else {
-    glassSize.value = "on";
-  }
+function setGlassSize(i) {
+  let glassRawData = i;
+  glassFinData = map(glassRawData, 20, 1024, 4, 10);
+  glassArea = ((glassFinData * glassFinData) / 4) * 3.14;
+
   // get the span associated with it and change its text:
-  let thisSpan = document.getElementById(glassSize.id + "Val");
-  thisSpan.innerHTML = "Power is " + glassSize.value;
+  let thisSpan = document.getElementById(glassDia);
+  thisSpan.innerHTML = glassFinData;
+  glassSize.style.width = glassFinData * 45;
 }
 
 function setWaterVolume(e) {
   // assume e is a number:
-  var currentValue = e;
-  // but if it's an object instead, it's because
-  // the slider change event called this function.
-  // Extract the number from it:
-  if (typeof e == "object") {
-    currentValue = e.target.value;
-  }
+  let waterRawData = e;
+  let waterFinData = map(waterRawData, 20, 1000, 0, 50.24);
   //get the span associated with it and change its text:
-  let thisSpan = document.getElementById(waterVolume.id + "Val");
-  thisSpan.innerHTML = currentValue;
+  let thisSpan = document.getElementById(waterVol);
+  thisSpan.innerHTML = waterFinData;
+
+  let waterheight = (waterFinData / glassArea) * 100;
+  let thisBlock = document.getElementById(water);
+  thisBlock.style.height = waterheight + "%";
 }
 
 // make a serial port selector object:

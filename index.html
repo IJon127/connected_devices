@@ -5,7 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-    <title>Water Game</title>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js"
+      integrity="sha512-WIklPM6qPCIp6d3fSSr90j+1unQHUOoWDS4sdTiR8gxUTnyZ8S2Mr8e10sKKJ/bhJgpAa/qG068RDkg6fIlNFA=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.29/lib/p5.serialport.js"
+    ></script>
+    <script src="script.js"></script>
+    <title>Water Adding Game</title>
   </head>
   <body>
     <section id="illustration">
@@ -17,10 +28,21 @@
     <section id="description">
       <h1>Water Adding Game</h1>
       <p>
-        Water Game is an educational game for kids to learn the concept of
-        surface area to volume ratio. Please add water into the glass and turn
-        the knob to change the size of the glass.
+        Water Adding Game is an educational game for kids to learn the concept
+        of surface area to volume ratio. Please add water into the glass and
+        turn the knob to change the size of the glass.
       </p>
+      <div id="serialport">
+        <select id="portSelector"></select>
+      </div>
+      <div class="data">
+        <h4>Water Volume:</h4>
+        <p id="waterVol">0</p>
+      </div>
+      <div class="data">
+        <h4>Glass Diameter:</h4>
+        <p id="glassDia">5</p>
+      </div>
     </section>
   </body>
 </html>
