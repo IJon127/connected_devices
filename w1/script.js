@@ -8,11 +8,12 @@ let serial;
 
 // this function is called when the page is loaded.
 function setup(event) {
+  //???????????????
   glassSize = document.getElementById("container");
-  glassSize.addEventListener("change", setGlassSize);
+  //   glassSize.addEventListener("change", setGlassSize);
 
   waterVolume = document.getElementById("water");
-  waterVolume.addEventListener("change", setWaterVolume);
+  //   waterVolume.addEventListener("change", setWaterVolume);
 
   // initialize the serialport object:
   serial = new p5.SerialPort();
@@ -20,11 +21,12 @@ function setup(event) {
   serial.on("data", serialEvent);
   serial.list(); // list the serial ports
 
-  setGlassSize();
-  setWaterVolume();
+  setGlassSize(); //???????????????????
+  setWaterVolume(); //?????????????
 }
 
 function setGlassSize(i) {
+  //???????????????
   let glassRawData = i;
   glassFinData = map(glassRawData, 20, 1024, 4, 10);
   glassArea = ((glassFinData * glassFinData) / 4) * 3.14;
@@ -77,6 +79,7 @@ function serialEvent() {
     var sensors = JSON.parse(inData);
     setGlassSize(sensors.pot);
     setWaterVolume(sensors.fsr);
+    console.log(inData);
   }
 }
 
