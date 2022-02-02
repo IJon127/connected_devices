@@ -10,19 +10,16 @@ let serial;
 function setup(event) {
   //???????????????
   glassSize = document.getElementById("container");
-  //   glassSize.addEventListener("change", setGlassSize);
+  // glassSize.addEventListener("change", setGlassSize);
 
   waterVolume = document.getElementById("water");
-  //   waterVolume.addEventListener("change", setWaterVolume);
+  // waterVolume.addEventListener("change", setWaterVolume);
 
   // initialize the serialport object:
   serial = new p5.SerialPort();
   serial.on("list", printList);
   serial.on("data", serialEvent);
   serial.list(); // list the serial ports
-
-  setGlassSize(); //???????????????????
-  setWaterVolume(); //?????????????
 }
 
 function setGlassSize(i) {
@@ -32,21 +29,21 @@ function setGlassSize(i) {
   glassArea = ((glassFinData * glassFinData) / 4) * 3.14;
 
   // get the span associated with it and change its text:
-  let thisSpan = document.getElementById(glassDia);
-  thisSpan.innerHTML = glassFinData;
-  glassSize.style.width = glassFinData * 45;
+  let thisSpan = document.getElementById("glassDia");
+  thisSpan.innerHTML = glassFinData.toFixed(2);
+  glassSize.style.width = Math.floor(glassFinData * 45) + "px";
 }
 
 function setWaterVolume(e) {
   // assume e is a number:
   let waterRawData = e;
-  let waterFinData = map(waterRawData, 20, 1000, 0, 50.24);
+  let waterFinData = map(waterRawData, 0, 1024, 0, 50.24);
   //get the span associated with it and change its text:
-  let thisSpan = document.getElementById(waterVol);
-  thisSpan.innerHTML = waterFinData;
+  let thisSpan = document.getElementById("waterVol");
+  thisSpan.innerHTML = waterFinData.toFixed(2);
 
   let waterheight = (waterFinData / glassArea) * 100;
-  let thisBlock = document.getElementById(water);
+  let thisBlock = document.getElementById("water");
   thisBlock.style.height = waterheight + "%";
 }
 
@@ -86,19 +83,10 @@ function serialEvent() {
 window.addEventListener("DOMContentLoaded", setup);
 
 /***************************************************************************************
- *    Title: <title of program/source code>
- *    Author: <author(s) names>
- *    Date: <date>
- *    Code version: <code version>
- *    Availability: <where it's located>
- *
- ***************************************************************************************/
-
-/***************************************************************************************
- *    Title: GraphicsDrawer source code
+ *    Title: serialport
  *    Author: Igoe, T
- *    Date: 2021
- *    Code version: 2.0
- *    Availability: http://www.graphicsdrawer.com
+ *    Date: 2022
+ *    Code version: 2.0 ??
+ *    Availability: https://github.com/tigoe/html-for-conndev/tree/main/serialport
  *
  ***************************************************************************************/
