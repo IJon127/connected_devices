@@ -25,11 +25,10 @@
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-#define NUMFLAKES     10 // Number of snowflakes in the animation example
 
-#define LOGO_HEIGHT   16
-#define LOGO_WIDTH    16
-static const unsigned char PROGMEM logo_bmp[] =
+#define IMG_HEIGHT   16
+#define IMG_WIDTH    16
+static const unsigned char PROGMEM img_bmp[] =
 { 0b00000111, 0b11100000,
   0b00011000, 0b00011000,
   0b00100000, 0b00000100,
@@ -54,7 +53,7 @@ int countdown;
 const int btnPin = 2;
 bool starting = true;
 bool selected = false;
-String urlString = "http://ijon.xyz";
+String urlString = "https://github.com/IJon127/personal_website";
 
 void setup() {
   Serial.begin(9600);
@@ -79,7 +78,7 @@ void loop() {
 
   if (starting) {
     introduction();
-    if (btnReading == HIGH) {
+    if (btnReading == HIGH || countdown < 0) {
       selected = true;
       selectedPotValue =  potReading;
     }
@@ -142,9 +141,9 @@ void showImg(void) {
   display.clearDisplay();
 
   display.drawBitmap(
-    (display.width()  - LOGO_WIDTH ) / 2,
-    (display.height() - LOGO_HEIGHT) / 2,
-    logo_bmp, LOGO_WIDTH, LOGO_HEIGHT, 1);
+    (display.width()  - IMG_WIDTH ) / 2,
+    (display.height() - IMG_HEIGHT) / 2,
+    img_bmp, IMG_WIDTH, IMG_HEIGHT, 1);
   display.display();
   delay(1000);
 }
