@@ -161,8 +161,14 @@ void displayQrCode(String message) {
   // or https://www.qrcode.com/en/about/version.html for
   // calculation of data capacity of a QR code. Current
   // settings will support a string of about 100 bytes:
+
+  /*The version of a QR code is a number between 1 and 40 (inclusive), 
+  which indicates the size of the QR code. 
+  The width and height of a QR code are equal to 4 * version + 17.*/
   int qrVersion = 5;
-  // can be ECC_LOW, ECC_MEDIUM, ECC_QUARTILE and ECC_HIGH (0-3, respectively):
+  /*Higher levels of error correction sacrifice data capacity, 
+  but allow a larger portion of the QR code to be damaged or unreadable.
+  can be ECC_LOW, ECC_MEDIUM, ECC_QUARTILE and ECC_HIGH (0-3, respectively):*/
   int qrErrorLevel = ECC_LOW;
 
   // allocate QR code memory:
