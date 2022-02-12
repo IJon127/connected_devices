@@ -1,0 +1,20 @@
+* {
+  margin: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  border: solid 1px red;
+}
+
+.square_container {
+  width: 600px;
+  height: 600px;
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: (1fr)[8];
+  grid-template-columns: repeat(8, 1fr);
+}
+
+.square {
+  border: solid 1px red;
+  padding-top: 100%;
+}
