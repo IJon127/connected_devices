@@ -67,6 +67,11 @@ h1 {
   display: none;
 }
 
+.icon_name {
+  display: inline-block;
+  width: 80px;
+}
+
 #explosion {
   background-color: black;
   background-image: url(assets/explosion.png);
