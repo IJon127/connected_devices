@@ -2,19 +2,72 @@
   margin: 0;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
-  border: solid 1px red;
+  background-color: black;
+  color: #eeeeee;
 }
 
-.square_container {
+#container {
   width: 600px;
-  height: 600px;
   display: -ms-grid;
   display: grid;
-  -ms-grid-columns: (1fr)[8];
+  -ms-grid-columns: 1fr 5px 1fr 5px 1fr 5px 1fr 5px 1fr 5px 1fr 5px 1fr 5px 1fr;
   grid-template-columns: repeat(8, 1fr);
+  grid-gap: 5px;
 }
 
-.square {
-  border: solid 1px red;
+.wrapper {
+  width: 700px;
+  margin: auto;
+  padding: 50px;
+}
+
+.heading {
+  margin-bottom: 50px;
+}
+
+h1 {
+  font-size: 50px;
+}
+
+.cell {
+  border: solid 1px #222222;
   padding-top: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.treasure {
+  background-image: url(assets/treasure.png);
+}
+
+.bomb {
+  background-image: url(assets/bomb.png);
+}
+
+.current_location {
+  border: solid 3px #cccccc;
+  border-radius: 15px;
+}
+
+.ending {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+.hidden {
+  display: none;
+}
+
+#explosion {
+  background-color: black;
+  background-image: url(assets/explosion.png);
 }

@@ -5,22 +5,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-    <script src="script.js"></script>
+
     <title>Treasure Hunt</title>
   </head>
   <body>
     <main class="wrapper">
-      <h1 id="project_title">Treasure Hunt</h1>
-      <p id="instruction"></p>
-      <button type="button" id="level1">BEGINNER</button>
-      <button type="button" id="level2">STANDARD</button>
-      <button type="button" id="level3">EXPERT</button>
-      <!-- <input type="button" value="Beginner" onclick="startGame(4)" />
-      <input type="button" value="Standard" onclick="startGame(6)" />
-      <input type="button" value="Expert" onclick="startGame(10)" /> -->
-      <div class="square_container"></div>
+      <section class="heading">
+        <h1 id="project_title">Treasure Hunt</h1>
+        <p id="instruction">
+          Move the block to the position of the treasure and avoid the bomb.
+        </p>
+      </section>
+      <div id="container"></div>
     </main>
-    <footer>
+    <section id="explosion" class="ending hidden"></section>
+    <footer class="wrapper">
       <h3>image attribution</h3>
       <div class="icon">
         <div class="icon_name">treasure:</div>
@@ -41,5 +40,6 @@
         >
       </div>
     </footer>
+    <script src="script.js"></script>
   </body>
 </html>
