@@ -23,15 +23,16 @@ const placeYourself = function () {
 
 const placeTreasure = function () {
   treasureLoc = Math.trunc(Math.random() * cellNum);
+  while (treasureLoc === currentLoc) {
+    treasureLoc = Math.trunc(Math.random() * cellNum);
+  }
   cells[treasureLoc].classList.add("treasure");
 };
 
 const placeBomb = function () {
-  let tempLoc = Math.abs(Math.trunc(Math.random() * cellNum) - 1);
-  if (tempLoc !== treasureLoc) {
-    bombLoc = tempLoc;
-  } else {
-    bombLoc = tempLoc - 1;
+  bombLoc = Math.trunc(Math.random() * cellNum);
+  while (bombLoc === currentLoc || bombLoc === treasureLoc) {
+    bombLoc = Math.trunc(Math.random() * cellNum);
   }
   cells[bombLoc].classList.add("bomb");
 };
