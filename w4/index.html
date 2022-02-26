@@ -38,7 +38,7 @@
         console.log("characteristics: ", characteristics);
         myCharacteristic = characteristics[0];
         // Read the value of the first characteristic
-        myBLE.read(myCharacteristic, gotValue);
+        myBLE.read(myCharacteristic, "string", gotValue);
       }
 
       // A function that will be called once got values
@@ -47,7 +47,7 @@
         console.log("value: ", value);
         myValue = value;
         // After getting a value, call p5ble.read() again to get the value again
-        myBLE.read(myCharacteristic, gotValue);
+        myBLE.read(myCharacteristic, "string", gotValue);
       }
 
       function draw() {
