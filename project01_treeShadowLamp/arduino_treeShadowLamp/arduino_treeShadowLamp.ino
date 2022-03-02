@@ -25,6 +25,9 @@ const int readingLengthGyroscope = 23; //-180.00,-180.00,-180.00
 String axyz; //acceleroemeter data in string
 String gxyz; //gyroscope data in string
 
+int breathing = 0;
+int breathingSpeed = 1;
+
 
 /*
   BLERead: ask the peripheral to send back the current value of the characteristic. Often used for characteristics that don't change very often, for example characteristics used for configuration, version numbers, etc.
@@ -81,13 +84,17 @@ void loop() {
   float absGx = abs(gx) * 100;
   float absGy = abs(gy) * 100;
   float absGz = abs(gz) * 100;
-  int r = map(absGx, 0, 3000, 5, 255);
-  int g = map(absGy, 0, 3000, 5, 255);
-  int b = map(absGz, 0, 3000, 5, 255);
 
-  analogWrite(2, r);
-  analogWrite(3, g);
-  analogWrite(4, b);
+
+  breathing += breathingSpeed;
+  if (breathing >= 255 | breathing <= 0) {
+    breathingSpeed = breathingSpeed * -1;
+  }
+
+  int ledX = breathing;
+  int ledY = breathing;
+  int ledZ = breathing;
+
 
   Serial.print("Accelerometer>> ");
   Serial.print("x: ");
@@ -123,8 +130,16 @@ void loop() {
 
       acceleroCharacteristic.writeValue(axyz.c_str());
       gyroCharacteristic.writeValue(gxyz.c_str());
+
+      ledX = map(absGx, 0, 3000, 5, 255);
+      ledY = map(absGy, 0, 3000, 5, 255);
+      ledZ = map(absGz, 0, 3000, 5, 255);
     }
   }
+
+  analogWrite(2, ledX);
+  analogWrite(3, ledY);
+  analogWrite(4, ledZ);
 
 
 
