@@ -37,15 +37,6 @@ function setup() {
 }
 
 function draw() {
-  // vidOpacity[0] = map(accelero.z, 1.02, 0.8, 180, 255);
-  // vidOpacity[1] = map(accelero.x, 0, 0.4, 100, 255);
-  // vidOpacity[2] = map(accelero.y, 0, 0.4, 100, 255);
-
-  // vidOpacity[0] = 150;
-  // for (let i = 1; i < 4; i++) {
-  //   vidOpacity[i] = map(abs(gyro[i - 1]), 0, 60, 100, 255);
-  // }
-
   for (let i = 0; i < 3; i++) {
     if (abs(gyro[i]) > 3) {
       vidOpacity[i + 1] += random(5);
