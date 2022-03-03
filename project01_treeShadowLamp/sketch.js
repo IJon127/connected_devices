@@ -15,6 +15,8 @@ let vidOpacity = [30, 20, 20, 20];
 
 let bgmSound;
 let leafSound;
+let bgmVol = 0;
+let leafVol = 0;
 
 function preload() {
   bgmSound = loadSound("assets/bgmSound.wav");
@@ -44,14 +46,14 @@ function draw() {
   for (let i = 0; i < 3; i++) {
     if (abs(gyro[i]) > 5) {
       vidOpacity[i + 1] += random(5);
-      if (vidOpacity[i + 1] > 255) {
-        vidOpacity[i + 1] = 255;
-      }
+      leafVol += 0.003;
+      if (vidOpacity[i + 1] > 255) vidOpacity[i + 1] = 255;
+      if (leafVol > 1) leafVol = 1;
     } else {
       vidOpacity[i + 1] -= 12;
-      if (vidOpacity[i + 1] < 20) {
-        vidOpacity[i + 1] = 20;
-      }
+      leafVol -= 0.005;
+      if (vidOpacity[i + 1] < 20) vidOpacity[i + 1] = 20;
+      if (leafVol < 0) leafVol = 0;
     }
   }
 
@@ -70,6 +72,13 @@ function draw() {
   text(acceleroValue, 100, 100);
   text(gyroValue, 100, 150);
   text(angleValue, 100, 200);
+
+  //set audio volume----
+  bgmSound.setVolume(bgmVol);
+  leafSound.setVolume(leafVol);
+  // leafSound.pan(accelero[1]);
+  bgmVol += 0.01;
+  if (bgmVol > 0.2) bgmVol = 0.2;
 }
 
 // BLE functions ===============================================
@@ -77,6 +86,8 @@ function draw() {
 function connectToBle() {
   // Connect to a device by passing the service UUID
   lampBLE.connect(serviceUuid, gotCharacteristics);
+  bgmVol = 0;
+  bgmSound.loop();
 }
 
 // A function that will be called once got characteristics
@@ -90,6 +101,8 @@ function gotCharacteristics(error, characteristics) {
   lampBLE.read(acceleroCharacteristic, "string", gotAcceleroValue);
   lampBLE.read(gyroCharacteristic, "string", gotGyroValue);
   lampBLE.read(angleCharacteristic, gotAngleValue);
+
+  leafSound.loop();
 }
 
 // A function that will be called once got values
