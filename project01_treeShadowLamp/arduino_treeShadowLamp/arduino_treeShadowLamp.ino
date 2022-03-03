@@ -27,6 +27,7 @@ const int readingLengthGyroscope = 23; //-180.00,-180.00,-180.00
 String axyz; //acceleroemeter data in string
 String gxyz; //gyroscope data in string
 int angle255;
+float angle;
 
 int breathing = 0;
 int breathingSpeed = 1;
@@ -40,7 +41,7 @@ int breathingSpeed = 1;
 BLEService bleService(serviceUuid);
 BLECharacteristic acceleroCharacteristic(characteristicUuidAccelerometer, BLERead | BLENotify,  readingLengthAccelerometer);
 BLECharacteristic gyroCharacteristic(characteristicUuidGyroscope, BLERead | BLENotify,  readingLengthGyroscope);
-BLEUnsignedCharCharacteristic angleCharacteristic(characteristicUuidAngle, BLERead | BLENotify);
+BLEFloatCharacteristic angleCharacteristic(characteristicUuidAngle, BLERead | BLENotify);
 
 
 void setup() {
@@ -69,7 +70,7 @@ void setup() {
   BLE.addService(bleService);
   acceleroCharacteristic.writeValue(axyz.c_str());
   gyroCharacteristic.writeValue(gxyz.c_str());
-  angleCharacteristic.writeValue(angle255);
+  angleCharacteristic.writeValue(angle);
   BLE.advertise();
 
   Serial.println("Bluetooth device ready, waiting for connections!");
@@ -79,7 +80,7 @@ void loop() {
 
   float ax, ay, az; //accelerometer data
   float gx, gy, gz; //gyroscope data
-  float angle; 
+//  float angle; 
   
 
   //convert XY location to angle
@@ -94,7 +95,7 @@ void loop() {
     else
       angle += 360;
   }
-  angle =floor(angle*100);
+//  angle =floor(angle*100);
 
 
   if (IMU.accelerationAvailable()) {
@@ -161,7 +162,7 @@ void loop() {
       gyroCharacteristic.writeValue(gxyz.c_str());
 
       angle255 = map(angle, 0, 36000, 0, 255);
-      angleCharacteristic.writeValue(angle255);
+      angleCharacteristic.writeValue(angle);
 
       ledX = map(absGx, 0, 1000, 5, 255);
       ledY = map(absGy, 0, 1000, 5, 255);

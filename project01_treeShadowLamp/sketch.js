@@ -1,3 +1,4 @@
+let lampBLE;
 const serviceUuid = "3922bb2e-0000-4c31-b690-5ee7074abc1f";
 let acceleroCharacteristic;
 let gyroCharacteristic;
@@ -6,22 +7,25 @@ let acceleroValue = 0;
 let gyroValue = 0;
 let angleValue = 0;
 
-let lampBLE;
-
 let accelero = [0, 0, 1];
 let gyro = [0, 0, 0];
 
 let vid = [];
-let vidOpacity = [150, 20, 20, 20];
+let vidOpacity = [30, 20, 20, 20];
 
-let moving = false;
+let bgmSound;
+let leafSound;
+
+function preload() {
+  bgmSound = loadSound("assets/bgmSound.wav");
+  leafSound = loadSound("assets/leafSound.wav");
+}
 
 function setup() {
   // Create a p5ble class
   lampBLE = new p5ble();
   createCanvas(1200, 800);
   textSize(20);
-  // textAlign(CENTER, CENTER);
 
   // Create a 'Connect' button
   const connectButton = createButton("Connect");
@@ -38,21 +42,21 @@ function setup() {
 
 function draw() {
   for (let i = 0; i < 3; i++) {
-    if (abs(gyro[i]) > 3) {
+    if (abs(gyro[i]) > 5) {
       vidOpacity[i + 1] += random(5);
       if (vidOpacity[i + 1] > 255) {
         vidOpacity[i + 1] = 255;
       }
     } else {
-      vidOpacity[i + 1] -= 4;
+      vidOpacity[i + 1] -= 12;
       if (vidOpacity[i + 1] < 20) {
-        vidOpacity[i + 1] = 0;
+        vidOpacity[i + 1] = 20;
       }
     }
   }
 
   blendMode(BLEND);
-  background(60);
+  background(20);
   blendMode(HARD_LIGHT);
 
   tint(255, vidOpacity[0]);
@@ -68,7 +72,7 @@ function draw() {
   text(angleValue, 100, 200);
 }
 
-// BLE functions =======================================
+// BLE functions ===============================================
 
 function connectToBle() {
   // Connect to a device by passing the service UUID
