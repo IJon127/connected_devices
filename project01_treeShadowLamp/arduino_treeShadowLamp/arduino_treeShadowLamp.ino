@@ -1,9 +1,10 @@
 /**************************************************************************
   Accelerometer data via bluetooth LE
   Uses Arduino LSM6DS3 library example (by Riccardo Rizzo): https://www.arduino.cc/en/Reference/ArduinoLSM6DS3
-  and Tom Igoe's AS7341_Spectrometer_BLE: https://github.com/tigoe/LightProjects/blob/35061270d781354512571693dad21837ac4fc612/spectrometers/AS7341/AS7341_Spectrometer_BLE/AS7341_Spectrometer_BLE.ino
+  Tom Igoe's AS7341_Spectrometer_BLE: https://github.com/tigoe/LightProjects/blob/35061270d781354512571693dad21837ac4fc612/spectrometers/AS7341/AS7341_Spectrometer_BLE/AS7341_Spectrometer_BLE.ino
+  Visualize Gravitation Effect with Neopixel Ring and Accelerometer: https://petervojtek.github.io/diy/2015/01/24/neopixel-gravitation.html
   created 20 Feb 2022
-  modified 21 Feb 2022
+  modified 03 March 2022
   by I-Jon Hsieh
  **************************************************************************/
 
@@ -17,6 +18,7 @@
 char serviceUuid[] = "3922BB2E-0000-4C31-B690-5EE7074ABC1F";
 char characteristicUuidAccelerometer[] = "3922BB2E-0001-4C31-B690-5EE7074ABC1F";
 char characteristicUuidGyroscope[] = "3922BB2E-0002-4C31-B690-5EE7074ABC1F";
+char characteristicUuidAngle[] = "3922BB2E-0003-4C31-B690-5EE7074ABC1F";
 
 //name the device
 char bleName[] = "treeShadowLamp";
@@ -24,6 +26,7 @@ const int readingLengthAccelerometer = 17; //-0.00,-0.00,-0.00
 const int readingLengthGyroscope = 23; //-180.00,-180.00,-180.00
 String axyz; //acceleroemeter data in string
 String gxyz; //gyroscope data in string
+int angle255;
 
 int breathing = 0;
 int breathingSpeed = 1;
@@ -37,6 +40,8 @@ int breathingSpeed = 1;
 BLEService bleService(serviceUuid);
 BLECharacteristic acceleroCharacteristic(characteristicUuidAccelerometer, BLERead | BLENotify,  readingLengthAccelerometer);
 BLECharacteristic gyroCharacteristic(characteristicUuidGyroscope, BLERead | BLENotify,  readingLengthGyroscope);
+BLEUnsignedCharCharacteristic angleCharacteristic(characteristicUuidAngle, BLERead | BLENotify);
+
 
 void setup() {
   Serial.begin(9600);
@@ -53,15 +58,18 @@ void setup() {
 
   axyz = "0.00,0.00,0.00";
   gxyz = "0.00,0.00,0.00";
+  angle255 = 0;
 
 
   BLE.setLocalName(bleName);
   BLE.setAdvertisedService(bleService);
   bleService.addCharacteristic(acceleroCharacteristic);
   bleService.addCharacteristic(gyroCharacteristic);
+  bleService.addCharacteristic(angleCharacteristic);
   BLE.addService(bleService);
   acceleroCharacteristic.writeValue(axyz.c_str());
   gyroCharacteristic.writeValue(gxyz.c_str());
+  angleCharacteristic.writeValue(angle255);
   BLE.advertise();
 
   Serial.println("Bluetooth device ready, waiting for connections!");
@@ -71,9 +79,28 @@ void loop() {
 
   float ax, ay, az; //accelerometer data
   float gx, gy, gz; //gyroscope data
+  float angle; 
+  
+
+  //convert XY location to angle
+  angle = atan(ay / ax) * 180 / 3.14;
+  if (angle > 0.0) {
+    if (ax < 0.0)
+      angle += 180;
+  }
+  else {
+    if (ay > 0.0)
+      angle += 180;
+    else
+      angle += 360;
+  }
+  angle =floor(angle*100);
+
 
   if (IMU.accelerationAvailable()) {
     IMU.readAcceleration(ax, ay, az);
+
+
   }
 
   if (IMU.gyroscopeAvailable()) {
@@ -110,6 +137,8 @@ void loop() {
   Serial.print(gy);
   Serial.print(",  z: ");
   Serial.println(gz);
+  Serial.println(angle);
+
 
   //connect to ble===================
   BLEDevice central = BLE.central();
@@ -131,9 +160,12 @@ void loop() {
       acceleroCharacteristic.writeValue(axyz.c_str());
       gyroCharacteristic.writeValue(gxyz.c_str());
 
-      ledX = map(absGx, 0, 3000, 5, 255);
-      ledY = map(absGy, 0, 3000, 5, 255);
-      ledZ = map(absGz, 0, 3000, 5, 255);
+      angle255 = map(angle, 0, 36000, 0, 255);
+      angleCharacteristic.writeValue(angle255);
+
+      ledX = map(absGx, 0, 1000, 5, 255);
+      ledY = map(absGy, 0, 1000, 5, 255);
+      ledZ = map(absGz, 0, 1000, 5, 255);
     }
   }
 
