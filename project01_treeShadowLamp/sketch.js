@@ -1,20 +1,27 @@
 const serviceUuid = "3922bb2e-0000-4c31-b690-5ee7074abc1f";
-let myCharacteristic;
-let myValue = 0;
+let acceleroCharacteristic;
+let gyroCharacteristic;
+let angleCharacteristic;
+let acceleroValue = 0;
+let gyroValue = 0;
+let angleValue = 0;
+
 let lampBLE;
 
-let ax = 0;
-let ay = 0;
-let az = 1;
+let accelero = [0, 0, 1];
+let gyro = [0, 0, 0];
+
 let vid = [];
-let vidOpacity = [];
+let vidOpacity = [150, 20, 20, 20];
+
+let moving = false;
 
 function setup() {
   // Create a p5ble class
   lampBLE = new p5ble();
-  createCanvas(600, 400);
+  createCanvas(1200, 800);
   textSize(20);
-  textAlign(CENTER, CENTER);
+  // textAlign(CENTER, CENTER);
 
   // Create a 'Connect' button
   const connectButton = createButton("Connect");
@@ -30,19 +37,44 @@ function setup() {
 }
 
 function draw() {
-  vidOpacity[0] = map(az, 1.02, 0.8, 50, 255);
-  vidOpacity[1] = map(ax, 0, 0.4, 0, 255);
-  vidOpacity[2] = map(ay, 0, 0.4, 0, 255);
+  // vidOpacity[0] = map(accelero.z, 1.02, 0.8, 180, 255);
+  // vidOpacity[1] = map(accelero.x, 0, 0.4, 100, 255);
+  // vidOpacity[2] = map(accelero.y, 0, 0.4, 100, 255);
+
+  // vidOpacity[0] = 150;
+  // for (let i = 1; i < 4; i++) {
+  //   vidOpacity[i] = map(abs(gyro[i - 1]), 0, 60, 100, 255);
+  // }
+
+  for (let i = 0; i < 3; i++) {
+    if (abs(gyro[i]) > 3) {
+      vidOpacity[i + 1] += random(5);
+      if (vidOpacity[i + 1] > 255) {
+        vidOpacity[i + 1] = 255;
+      }
+    } else {
+      vidOpacity[i + 1] -= 4;
+      if (vidOpacity[i + 1] < 20) {
+        vidOpacity[i + 1] = 0;
+      }
+    }
+  }
 
   blendMode(BLEND);
-  background(0);
+  background(60);
   blendMode(HARD_LIGHT);
-  for (let i = 0; i < 3; i++) {
-    tint(255, vidOpacity[0]);
+
+  tint(255, vidOpacity[0]);
+  image(vid[0], 0, 0, width, height); // background video
+
+  for (let i = 1; i < 4; i++) {
+    tint(255, vidOpacity[i]);
     image(vid[i], 0, 0, width, height);
   }
 
-  text(myValue, 100, 100);
+  text(acceleroValue, 100, 100);
+  text(gyroValue, 100, 150);
+  text(angleValue, 100, 200);
 }
 
 // BLE functions =======================================
@@ -55,25 +87,49 @@ function connectToBle() {
 // A function that will be called once got characteristics
 function gotCharacteristics(error, characteristics) {
   if (error) console.log("error: ", error);
-  console.log("characteristics: ", characteristics);
-  myCharacteristic = characteristics[0];
-  // Read the value of the first characteristic
-  lampBLE.read(myCharacteristic, "string", gotValue);
+  // console.log("characteristics: ", characteristics);
+  acceleroCharacteristic = characteristics[0];
+  gyroCharacteristic = characteristics[1];
+  angleCharacteristic = characteristics[2];
+
+  lampBLE.read(acceleroCharacteristic, "string", gotAcceleroValue);
+  lampBLE.read(gyroCharacteristic, "string", gotGyroValue);
+  lampBLE.read(angleCharacteristic, gotAngleValue);
 }
 
 // A function that will be called once got values
-function gotValue(error, value) {
+function gotAcceleroValue(error, value) {
   if (error) console.log("error: ", error);
-  console.log("value: ", value);
-  myValue = value;
+  // console.log("value: ", value);
+  acceleroValue = value;
 
-  let acceleroData = split(myValue, ",");
-  ax = acceleroData[0];
-  ay = acceleroData[1];
-  az = acceleroData[2];
+  let eachData = split(value, ",");
+  for (let i = 0; i < accelero.length; i++) {
+    accelero[i] = eachData[i];
+  }
 
-  // After getting a value, call p5ble.read() again to get the value again
-  lampBLE.read(myCharacteristic, "string", gotValue);
+  lampBLE.read(acceleroCharacteristic, "string", gotAcceleroValue);
+}
+
+function gotGyroValue(error, value) {
+  if (error) console.log("error: ", error);
+  // console.log("value: ", value);
+  gyroValue = value;
+
+  let eachData = split(value, ",");
+  for (let i = 0; i < gyro.length; i++) {
+    gyro[i] = eachData[i];
+  }
+
+  lampBLE.read(gyroCharacteristic, "string", gotGyroValue);
+}
+
+function gotAngleValue(error, value) {
+  if (error) console.log("error: ", error);
+  // console.log("value: ", value);
+  angleValue = floor(map(value, 0, 255, 0, 360));
+
+  lampBLE.read(angleCharacteristic, gotAngleValue);
 }
 
 /* **************************************************************************
@@ -88,6 +144,6 @@ Video sources:
 3: https://youtu.be/NWTJ_mhoQ38
 
 created 25 Feb 2022
-modified 01 Mar 2022 
+modified 03 Mar 2022 
 by I-Jon Hsieh
 ************************************************************************** */
