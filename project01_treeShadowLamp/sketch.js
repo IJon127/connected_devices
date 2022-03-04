@@ -1,14 +1,16 @@
 let lampBLE;
 const serviceUuid = "3922bb2e-0000-4c31-b690-5ee7074abc1f";
-let acceleroCharacteristic;
 let gyroCharacteristic;
+let gyroValue = 0;
+let gyro = [0, 0, 0];
+
+/*
+let acceleroCharacteristic;
 let angleCharacteristic;
 let acceleroValue = 0;
-let gyroValue = 0;
 let angleValue = 0;
-
 let accelero = [0, 0, 1];
-let gyro = [0, 0, 0];
+*/
 
 let vid = [];
 let vidOpacity = [30, 20, 20, 20];
@@ -51,7 +53,7 @@ function draw() {
       if (leafVol > 1) leafVol = 1;
     } else {
       vidOpacity[i + 1] -= 12;
-      leafVol -= 0.005;
+      leafVol -= 0.006;
       if (vidOpacity[i + 1] < 20) vidOpacity[i + 1] = 20;
       if (leafVol < 0) leafVol = 0;
     }
@@ -61,17 +63,20 @@ function draw() {
   background(20);
   blendMode(HARD_LIGHT);
 
+  // background video------
   tint(255, vidOpacity[0]);
-  image(vid[0], 0, 0, width, height); // background video
-
+  image(vid[0], 0, 0, width, height);
+  // videos changing with gyroscope data-----
   for (let i = 1; i < 4; i++) {
     tint(255, vidOpacity[i]);
     image(vid[i], 0, 0, width, height);
   }
 
-  text(acceleroValue, 100, 100);
   text(gyroValue, 100, 150);
+  /*
+  text(acceleroValue, 100, 100);
   text(angleValue, 100, 200);
+  */
 
   //set audio volume----
   bgmSound.setVolume(bgmVol);
@@ -93,31 +98,20 @@ function connectToBle() {
 // A function that will be called once got characteristics
 function gotCharacteristics(error, characteristics) {
   if (error) console.log("error: ", error);
-  // console.log("characteristics: ", characteristics);
-  acceleroCharacteristic = characteristics[0];
-  gyroCharacteristic = characteristics[1];
-  angleCharacteristic = characteristics[2];
-
-  lampBLE.read(acceleroCharacteristic, "string", gotAcceleroValue);
+  gyroCharacteristic = characteristics[0];
   lampBLE.read(gyroCharacteristic, "string", gotGyroValue);
+
+  /*
+  acceleroCharacteristic = characteristics[1];
+  angleCharacteristic = characteristics[2];
+  lampBLE.read(acceleroCharacteristic, "string", gotAcceleroValue);
   lampBLE.read(angleCharacteristic, gotAngleValue);
+  */
 
   leafSound.loop();
 }
 
 // A function that will be called once got values
-function gotAcceleroValue(error, value) {
-  if (error) console.log("error: ", error);
-  // console.log("value: ", value);
-  acceleroValue = value;
-
-  let eachData = split(value, ",");
-  for (let i = 0; i < accelero.length; i++) {
-    accelero[i] = eachData[i];
-  }
-
-  lampBLE.read(acceleroCharacteristic, "string", gotAcceleroValue);
-}
 
 function gotGyroValue(error, value) {
   if (error) console.log("error: ", error);
@@ -132,6 +126,20 @@ function gotGyroValue(error, value) {
   lampBLE.read(gyroCharacteristic, "string", gotGyroValue);
 }
 
+/*
+function gotAcceleroValue(error, value) {
+  if (error) console.log("error: ", error);
+  // console.log("value: ", value);
+  acceleroValue = value;
+
+  let eachData = split(value, ",");
+  for (let i = 0; i < accelero.length; i++) {
+    accelero[i] = eachData[i];
+  }
+
+  lampBLE.read(acceleroCharacteristic, "string", gotAcceleroValue);
+}
+
 function gotAngleValue(error, value) {
   if (error) console.log("error: ", error);
   // console.log("value: ", value);
@@ -139,6 +147,7 @@ function gotAngleValue(error, value) {
 
   lampBLE.read(angleCharacteristic, gotAngleValue);
 }
+*/
 
 /* **************************************************************************
 Tree Shadow Lamp 
