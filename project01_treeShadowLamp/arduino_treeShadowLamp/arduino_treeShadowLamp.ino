@@ -40,8 +40,8 @@ BLECharacteristic gyroCharacteristic(characteristicUuidGyroscope, BLERead | BLEN
   BLEIndicate and Notify: ask the peripheral to continuously send updated values of the characteristic, without the central having to constantly ask for it.
 */
 
-int breathing = 0;
-int breathingSpeed = 1;
+float breathing = 0;
+float breathingSpeed = 0.15;
 
 
 
@@ -125,9 +125,11 @@ void loop() {
     breathingSpeed = breathingSpeed * -1;
   }
 
-  int ledX = breathing;
-  int ledY = breathing;
-  int ledZ = breathing;
+  int breathingFloor = floor(breathing);
+
+  int ledX = breathingFloor;
+  int ledY = breathingFloor;
+  int ledZ = breathingFloor;
 
 
   Serial.print("Gyroscope>> ");
