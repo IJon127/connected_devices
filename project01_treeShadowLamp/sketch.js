@@ -28,7 +28,7 @@ function preload() {
 function setup() {
   // Create a p5ble class
   lampBLE = new p5ble();
-  createCanvas(1200, 800);
+  createCanvas(windowWidth, (windowWidth * 2) / 3);
   textSize(20);
 
   // Create a 'Connect' button
@@ -39,6 +39,7 @@ function setup() {
   for (let i = 0; i < 4; i++) {
     vid[i] = createVideo("assets/vid" + i + ".mp4");
     vid[i].speed(0.6);
+    vid[i].play();
     vid[i].loop();
     vid[i].hide();
   }
@@ -72,7 +73,7 @@ function draw() {
     image(vid[i], 0, 0, width, height);
   }
 
-  text(gyroValue, 100, 150);
+  // text(gyroValue, 100, 150);
   /*
   text(acceleroValue, 100, 100);
   text(angleValue, 100, 200);
@@ -161,6 +162,6 @@ Video sources:
 3: https://youtu.be/NWTJ_mhoQ38
 
 created 25 Feb 2022
-modified 03 Mar 2022 
+modified 08 Mar 2022 
 by I-Jon Hsieh
 ************************************************************************** */

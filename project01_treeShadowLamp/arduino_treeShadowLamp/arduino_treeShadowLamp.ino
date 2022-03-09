@@ -175,15 +175,15 @@ void loop() {
       */
 
 
-      ledX = map(absGx, 0, 1000, 5, 255);
-      ledY = map(absGy, 0, 1000, 5, 255);
-      ledZ = map(absGz, 0, 1000, 5, 255);
+      ledX = map(absGx, 0, 3000, 5, 255);
+      ledY = map(absGy, 0, 3000, 5, 255);
+      ledZ = map(absGz, 0, 3000, 5, 255);
     }
   }
 
   analogWrite(2, ledX);
   analogWrite(3, ledY);
-  analogWrite(4, ledZ);
+  analogWrite(A2, ledZ);
 
 
 
