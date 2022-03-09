@@ -73,8 +73,8 @@ function draw() {
     image(vid[i], 0, 0, width, height);
   }
 
-  // text(gyroValue, 100, 150);
   /*
+  text(gyroValue, 100, 150);
   text(acceleroValue, 100, 100);
   text(angleValue, 100, 200);
   */
