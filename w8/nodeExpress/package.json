@@ -4,7 +4,9 @@
     "name": "I-Jon Hsieh"
   },
   "dependencies": {
-    "express": ">=4.0.0"
+    "express": ">=4.0.0",
+    "body-parser": ">=1.11.0",
+    "multer": "*"
   },
   "engines": {
     "node": ">=0.10.x",
