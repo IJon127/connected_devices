@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Connected Devices",
+    "instructor": "Tom Igoe",
+    "semester": "spring 2022",
+    "credits": "4"
+  },
+  {
+    "name": "Haptics",
+    "instructor": "Kathryn Hartman",
+    "semester": "spring 2022",
+    "credits": "1"
+  },
+  {
+    "name": "Pcomp",
+    "instructor": "David Rios",
+    "semester": "fall 2022",
+    "credits": "2"
+  }
+]
