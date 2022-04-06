@@ -4,8 +4,8 @@ const url = require("url");
 const fs = require("fs");
 
 //load pages & read files -------------
-const homePage = fs.readFileSync(`${__dirname}/index.html`, "utf-8");
-const data = fs.readFileSync(`${__dirname}/data.json`, "utf-8");
+const homePage = fs.readFileSync(`../public/index.html`, "utf-8");
+const data = fs.readFileSync(`../public/data.json`, "utf-8");
 
 //server ----------------
 const server = http.createServer((req, res) => {
