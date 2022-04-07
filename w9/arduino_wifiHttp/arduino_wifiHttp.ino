@@ -1,8 +1,8 @@
 /**************************************************************************
   Wifi http client
-  Uses Tom Igoe's AS7341_Spectrometer_BLE: https://github.com/tigoe/LightProjects/blob/35061270d781354512571693dad21837ac4fc612/spectrometers/AS7341/AS7341_Spectrometer_BLE/AS7341_Spectrometer_BLE.ino
+  Uses Tom Igoe's TestHttpClient: https://github.com/tigoe/MakingThingsTalk2/blob/main/3rd_edition/chapter4/TestHttpClient/TestHttpClient.ino
   created 05 Apr 2022
-  modified 05 Apr 2022
+  modified 07 Apr 2022
   by I-Jon Hsieh
  **************************************************************************/
 #include <SPI.h>
@@ -13,7 +13,7 @@
 
 
 WiFiClient netSocket;
-const char server[] = "www.example.com";
+const char server[] = "ijon.xyz";
 String route = "/";
 int portNumber = 80;
 
@@ -45,6 +45,8 @@ void loop() {
   http.get(route);
 
   while(http.connected()){
+    Serial.println("connected");
+    Serial.println(http.available());
     if(http.available()){
       String result = http.readString();
       Serial.print(result);
