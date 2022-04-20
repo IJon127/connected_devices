@@ -4,3 +4,7 @@ w9/expressPractice/node_modules
 w9/arduino_wifiHttp/secret.h
 
 w10/arduino_mqtt/secret.h
+
+project02_doggolinko/attempt03_wifi/arduino/sensor/secrets.h
+project02_doggolinko/attempt03_wifi/arduino/servo/secrets.h
+
