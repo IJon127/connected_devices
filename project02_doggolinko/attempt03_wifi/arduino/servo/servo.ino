@@ -30,7 +30,7 @@ const int servoPin = 2;
 Servo myservo;
 float servoAngle = 0;
 const int openAngle = 97;      //should be 90 degree. However,each servo might be different
-float closingSpeed = 0.005;      //the decreasing angle of each loop
+float closingSpeed = 0.1;      //the decreasing angle of each loop
                   
 
 unsigned long lastTimer;    //the previous time sumState was HIGH
@@ -50,6 +50,7 @@ void setup() {
     Serial.print("Attempting to connecting to ");
     Serial.println(SECRET_SSID);
     WiFi.begin(SECRET_SSID, SECRET_PASS);
+    
     delay(2000);
   }
 
@@ -98,7 +99,6 @@ void loop() {
     Serial.println("OPEN!!!");
     lastTimer = millis();
     servoAngle = openAngle;
-    myservo.write(servoAngle);
   }
 
   if ((millis() - lastTimer) > waitingTime) {
