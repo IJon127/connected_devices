@@ -5,7 +5,7 @@
   Arduino Servo example Knob: http://www.arduino.cc/en/Tutorial/Knob
   Arduino Debounce example: https://www.arduino.cc/en/Tutorial/BuiltInExamples/Debounce
   created 19 April 2022
-  modified 19 April 2022
+  modified 25 April 2022
   by I-Jon Hsieh
  **************************************************************************/
 #include <WiFiNINA.h>
@@ -23,14 +23,19 @@ int port = 1883;
 char topic[] = "linkingDoggo";
 char clientID[] = "sensorClient";
 
-const int sensor1Pin = 4;           // the pin that the red button is atteched to
-const int sensor2Pin = 5;           // the pin that the yellow button is atteched to
+const int lowerSensorPin = 2;           // lower sensor
+const int higherSensorPin = 3;          // higher sensor
+const int lowerLedPin = 4;           // lower sensor led indicator
+const int higherLedPin = 5;           // higher sensor led indicator
+const int wifiLedPin = 6;           // wifi connected led indicator
+const int brokerLedPin = 6;           // mqtt broker connected led indicator
+const int errorLedPin = 7;          // mqtt error led indicator
 
 
 int state1 = LOW;               // by default, no motion detected
 int state2 = LOW;               // by default, no human detected
-int val1 = LOW;                 // variable to store the red button status (value)
-int val2 = LOW;                 // variable to store the yellow button status (value)
+int lowerVal = LOW;                 // variable to store the red button status (value)
+int higherVal = LOW;                 // variable to store the yellow button status (value)
 
 
 
@@ -44,22 +49,39 @@ unsigned long debounceDelay = 50;    // the debounce time; increase if the outpu
 
 
 void setup() {
-  pinMode(sensor1Pin, INPUT);         // initialize red button as an input
-  pinMode(sensor2Pin, INPUT);         // initialize yellow button as an input
+  pinMode(lowerSensorPin, INPUT);         
+  pinMode(higherSensorPin, INPUT);         
+  pinMode(lowerLedPin, OUTPUT);         
+  pinMode(higherLedPin, OUTPUT);   
+  pinMode(wifiLedPin, OUTPUT);         
+  pinMode(errorLedPin, OUTPUT);       
+
+  
+  digitalWrite(lowerLedPin, LOW);
+  digitalWrite(higherLedPin, LOW);
+  digitalWrite(wifiLedPin, LOW);
+  digitalWrite(errorLedPin, LOW);
 
   Serial.begin(9600);                 // initialize serial
 
-//  while(!Serial);
 
   while (WiFi.status() != WL_CONNECTED){
     Serial.print("Attempting to connecting to ");
     Serial.println(SECRET_SSID);
     WiFi.begin(SECRET_SSID, SECRET_PASS);
-    delay(2000);
+    digitalWrite(wifiLedPin, HIGH);
+    delay(500);
+    digitalWrite(wifiLedPin, LOW);
+    delay(500);
+    digitalWrite(wifiLedPin, HIGH);
+    delay(500);
+    digitalWrite(wifiLedPin, LOW);
+    delay(500);
   }
 
   Serial.print("Connected. My IP address: ");
   Serial.println(WiFi.localIP());
+  digitalWrite(wifiLedPin, HIGH);
 
   mqttClient.setId(clientID);
   mqttClient.setUsernamePassword(SECRET_MQTT_USER, SECRET_MQTT_PASS);
@@ -75,6 +97,30 @@ void setup() {
 
 
 void loop() {
+
+  //Sensor Data:
+  lowerVal = digitalRead(lowerSensorPin);   // read lower sensor value
+  higherVal = digitalRead(higherSensorPin);   // read highersensor value
+  Serial.print("lower: ");
+  Serial.print(lowerVal);
+  Serial.print("  higher: ");
+  Serial.println(higherVal);
+  
+  if (lowerVal == HIGH){
+    digitalWrite(lowerLedPin, HIGH);
+  } else {
+    digitalWrite(lowerLedPin, LOW);
+  }
+  if (higherVal == HIGH){
+    digitalWrite(higherLedPin, HIGH);
+  } else{
+    digitalWrite(higherLedPin, LOW);
+  }
+
+  state1 = checkSensorState(lowerVal, state1);
+  state2 = checkSensorState(higherVal, state2);
+  sumStateDebounce();
+  
   //MQTT connection:
   
   if (!mqttClient.connected()){          //if not connectd to the broker, try to connect:
@@ -82,14 +128,6 @@ void loop() {
     connectToBroker();
   }
 
-
-  //Sensor Data:
-  val1 = digitalRead(sensor1Pin);   // read red button value
-  val2 = digitalRead(sensor2Pin);   // read yellow button value
-
-  state1 = checkSensorState(val1, state1);
-  state2 = checkSensorState(val2, state2);
-  sumStateDebounce();
 
   
   //Sent sumState to MQTT broker:
