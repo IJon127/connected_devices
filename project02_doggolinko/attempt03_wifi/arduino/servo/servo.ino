@@ -27,10 +27,14 @@ char clientID[] = "servoClient";
 
 const int servoPin = 2;
 
+const int wifiLedPin = 3;           // wifi connected led indicator
+const int brokerLedPin = 4;           // mqtt broker connected led indicator
+const int errorLedPin = 5;
+
 Servo myservo;
-float servoAngle = 0;
-const int openAngle = 97;      //should be 90 degree. However,each servo might be different
-float closingSpeed = 0.1;      //the decreasing angle of each loop
+float servoAngle = 180;
+const int openAngle = 80;      //should be 90 degree. However,each servo might be different
+float closingSpeed = -0.01;      //the decreasing angle of each loop
                   
 
 unsigned long lastTimer;    //the previous time sumState was HIGH
@@ -40,7 +44,14 @@ int sumState;
 
 
 void setup() {
+  pinMode(wifiLedPin, OUTPUT); 
+  pinMode(brokerLedPin, OUTPUT);      
+  pinMode(errorLedPin, OUTPUT); 
   myservo.attach(servoPin);
+
+  digitalWrite(wifiLedPin, LOW);
+  digitalWrite(brokerLedPin, LOW);
+  digitalWrite(errorLedPin, LOW);
 
   Serial.begin(9600);                 // initialize serial
  
@@ -50,12 +61,19 @@ void setup() {
     Serial.print("Attempting to connecting to ");
     Serial.println(SECRET_SSID);
     WiFi.begin(SECRET_SSID, SECRET_PASS);
-    
-    delay(2000);
+    digitalWrite(wifiLedPin, HIGH);
+    delay(500);
+    digitalWrite(wifiLedPin, LOW);
+    delay(500);
+    digitalWrite(wifiLedPin, HIGH);
+    delay(500);
+    digitalWrite(wifiLedPin, LOW);
+    delay(500);
   }
 
   Serial.print("Connected. My IP address: ");
   Serial.println(WiFi.localIP());
+  digitalWrite(wifiLedPin, HIGH);
 
   mqttClient.setId(clientID);
   mqttClient.setUsernamePassword(SECRET_MQTT_USER, SECRET_MQTT_PASS);
@@ -66,6 +84,7 @@ void setup() {
   }
 
   Serial.println("Connected to broker");
+  digitalWrite(brokerLedPin, HIGH);
 }
 
 void loop() {
@@ -73,7 +92,12 @@ void loop() {
     
   if (!mqttClient.connected()){       //if not connectd to the broker, try to connect
     Serial.println("reconnecting");
+    digitalWrite(brokerLedPin, LOW);
+    digitalWrite(errorLedPin, HIGH);
     connectToBroker();
+  }else{
+    digitalWrite(brokerLedPin, HIGH);
+    digitalWrite(errorLedPin, LOW);
   }
 
   
@@ -102,10 +126,10 @@ void loop() {
   }
 
   if ((millis() - lastTimer) > waitingTime) {
-    if (servoAngle > 0) {
+    if (servoAngle < 180) {
       servoAngle -= closingSpeed;
     } else {
-      servoAngle = 0;
+      servoAngle = 180;
     }
   }
 

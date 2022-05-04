@@ -5,7 +5,7 @@
   Arduino Servo example Knob: http://www.arduino.cc/en/Tutorial/Knob
   Arduino Debounce example: https://www.arduino.cc/en/Tutorial/BuiltInExamples/Debounce
   created 19 April 2022
-  modified 25 April 2022
+  modified 3 May 2022
   by I-Jon Hsieh
  **************************************************************************/
 #include <WiFiNINA.h>
@@ -23,13 +23,13 @@ int port = 1883;
 char topic[] = "linkingDoggo";
 char clientID[] = "sensorClient";
 
-const int lowerSensorPin = 2;           // lower sensor
-const int higherSensorPin = 3;          // higher sensor
-const int lowerLedPin = 4;           // lower sensor led indicator
-const int higherLedPin = 5;           // higher sensor led indicator
+const int lowerSensorPin = 4;           // lower sensor
+const int higherSensorPin = 2;          // higher sensor
+const int lowerLedPin = 5;           // lower sensor led indicator
+const int higherLedPin = 3;           // higher sensor led indicator
 const int wifiLedPin = 6;           // wifi connected led indicator
-const int brokerLedPin = 6;           // mqtt broker connected led indicator
-const int errorLedPin = 7;          // mqtt error led indicator
+const int brokerLedPin = 7;           // mqtt broker connected led indicator
+const int errorLedPin = 8;          // mqtt error led indicator
 
 
 int state1 = LOW;               // by default, no motion detected
@@ -53,13 +53,15 @@ void setup() {
   pinMode(higherSensorPin, INPUT);         
   pinMode(lowerLedPin, OUTPUT);         
   pinMode(higherLedPin, OUTPUT);   
-  pinMode(wifiLedPin, OUTPUT);         
+  pinMode(wifiLedPin, OUTPUT); 
+  pinMode(brokerLedPin, OUTPUT);      
   pinMode(errorLedPin, OUTPUT);       
 
   
   digitalWrite(lowerLedPin, LOW);
   digitalWrite(higherLedPin, LOW);
   digitalWrite(wifiLedPin, LOW);
+  digitalWrite(brokerLedPin, LOW);
   digitalWrite(errorLedPin, LOW);
 
   Serial.begin(9600);                 // initialize serial
@@ -92,6 +94,7 @@ void setup() {
   }
 
   Serial.println("Connected to broker");
+  digitalWrite(brokerLedPin, HIGH);
 }
 
 
@@ -125,7 +128,12 @@ void loop() {
   
   if (!mqttClient.connected()){          //if not connectd to the broker, try to connect:
     Serial.println("reconnecting");
+    digitalWrite(brokerLedPin, LOW);
+    digitalWrite(errorLedPin, HIGH);
     connectToBroker();
+  }else{
+    digitalWrite(brokerLedPin, HIGH);
+    digitalWrite(errorLedPin, LOW);
   }
 
 
@@ -187,18 +195,18 @@ void sumStateDebounce() {
 
 
 
-
 boolean connectToBroker(){
   //if MQtt client is not connected:
   if (!mqttClient.connect(broker, port)){
     Serial.print("MQTT connection failed. Error no: ");
     Serial.println(mqttClient.connectError());
-
+    
     return false;
   }
 
   //once you're connected, process...
   mqttClient.subscribe(topic);
+
 
   return true;
 }
