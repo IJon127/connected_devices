@@ -66,24 +66,7 @@ void setup() {
 
   Serial.begin(9600);                 // initialize serial
 
-
-  while (WiFi.status() != WL_CONNECTED){
-    Serial.print("Attempting to connecting to ");
-    Serial.println(SECRET_SSID);
-    WiFi.begin(SECRET_SSID, SECRET_PASS);
-    digitalWrite(wifiLedPin, HIGH);
-    delay(500);
-    digitalWrite(wifiLedPin, LOW);
-    delay(500);
-    digitalWrite(wifiLedPin, HIGH);
-    delay(500);
-    digitalWrite(wifiLedPin, LOW);
-    delay(500);
-  }
-
-  Serial.print("Connected. My IP address: ");
-  Serial.println(WiFi.localIP());
-  digitalWrite(wifiLedPin, HIGH);
+  checkWifiConnection();
 
   mqttClient.setId(clientID);
   mqttClient.setUsernamePassword(SECRET_MQTT_USER, SECRET_MQTT_PASS);
@@ -196,6 +179,8 @@ void sumStateDebounce() {
 
 
 boolean connectToBroker(){
+  checkWifiConnection();
+  
   //if MQtt client is not connected:
   if (!mqttClient.connect(broker, port)){
     Serial.print("MQTT connection failed. Error no: ");
@@ -209,4 +194,24 @@ boolean connectToBroker(){
 
 
   return true;
+}
+
+void checkWifiConnection(){
+    while (WiFi.status() != WL_CONNECTED) {
+    Serial.print("Attempting to connecting to ");
+    Serial.println(SECRET_SSID);
+    WiFi.begin(SECRET_SSID, SECRET_PASS);
+    digitalWrite(wifiLedPin, HIGH);
+    delay(500);
+    digitalWrite(wifiLedPin, LOW);
+    delay(500);
+    digitalWrite(wifiLedPin, HIGH);
+    delay(500);
+    digitalWrite(wifiLedPin, LOW);
+    delay(500);
+  }
+
+  Serial.print("Connected. My IP address: ");
+  Serial.println(WiFi.localIP());
+  digitalWrite(wifiLedPin, HIGH);
 }

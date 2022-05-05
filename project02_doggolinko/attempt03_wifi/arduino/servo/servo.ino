@@ -5,7 +5,7 @@
   Arduino Servo example Knob: http://www.arduino.cc/en/Tutorial/Knob
   Arduino Debounce example: https://www.arduino.cc/en/Tutorial/BuiltInExamples/Debounce
   created 19 April 2022
-  modified 19 April 2022
+  modified 5 May 2022
   by I-Jon Hsieh
  **************************************************************************/
 #include <WiFiNINA.h>
@@ -57,23 +57,7 @@ void setup() {
  
 //  while (!Serial);
 
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print("Attempting to connecting to ");
-    Serial.println(SECRET_SSID);
-    WiFi.begin(SECRET_SSID, SECRET_PASS);
-    digitalWrite(wifiLedPin, HIGH);
-    delay(500);
-    digitalWrite(wifiLedPin, LOW);
-    delay(500);
-    digitalWrite(wifiLedPin, HIGH);
-    delay(500);
-    digitalWrite(wifiLedPin, LOW);
-    delay(500);
-  }
-
-  Serial.print("Connected. My IP address: ");
-  Serial.println(WiFi.localIP());
-  digitalWrite(wifiLedPin, HIGH);
+  checkWifiConnection();
 
   mqttClient.setId(clientID);
   mqttClient.setUsernamePassword(SECRET_MQTT_USER, SECRET_MQTT_PASS);
@@ -145,6 +129,8 @@ void loop() {
 //my functions---------------------------------------
 
 boolean connectToBroker(){
+  checkWifiConnection();
+  
   //if MQtt client is not connected:
   if (!mqttClient.connect(broker, port)){
     Serial.print("MQTT connection failed. Error no: ");
@@ -157,4 +143,24 @@ boolean connectToBroker(){
   mqttClient.subscribe(topic);
 
   return true;
+}
+
+void checkWifiConnection(){
+    while (WiFi.status() != WL_CONNECTED) {
+    Serial.print("Attempting to connecting to ");
+    Serial.println(SECRET_SSID);
+    WiFi.begin(SECRET_SSID, SECRET_PASS);
+    digitalWrite(wifiLedPin, HIGH);
+    delay(500);
+    digitalWrite(wifiLedPin, LOW);
+    delay(500);
+    digitalWrite(wifiLedPin, HIGH);
+    delay(500);
+    digitalWrite(wifiLedPin, LOW);
+    delay(500);
+  }
+
+  Serial.print("Connected. My IP address: ");
+  Serial.println(WiFi.localIP());
+  digitalWrite(wifiLedPin, HIGH);
 }
