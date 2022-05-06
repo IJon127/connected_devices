@@ -5,7 +5,7 @@
   Arduino Servo example Knob: http://www.arduino.cc/en/Tutorial/Knob
   Arduino Debounce example: https://www.arduino.cc/en/Tutorial/BuiltInExamples/Debounce
   created 19 April 2022
-  modified 3 May 2022
+  modified 5 May 2022
   by I-Jon Hsieh
  **************************************************************************/
 #include <WiFiNINA.h>
@@ -20,7 +20,7 @@ MqttClient mqttClient(wifi);
 //detials for MQTT client:
 char broker[] = "public.cloud.shiftr.io";
 int port = 1883;
-char topic[] = "linkingDoggo";
+char topic[] = "doggolinko";
 char clientID[] = "sensorClient";
 
 const int lowerSensorPin = 4;           // lower sensor
@@ -44,6 +44,8 @@ int lastSumState = LOW;        // the previous data from the summary of sensor 1
 unsigned long lastDebounceTime = 0;  // the last time the servo was toggled
 unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
+unsigned long lastMillis = 0;
+int randomNum = 10;
 
 
 
@@ -66,10 +68,13 @@ void setup() {
 
   Serial.begin(9600);                 // initialize serial
 
-  checkWifiConnection();
+  
 
   mqttClient.setId(clientID);
   mqttClient.setUsernamePassword(SECRET_MQTT_USER, SECRET_MQTT_PASS);
+
+
+  connectToBroker();
 
   while (!connectToBroker()){
     Serial.println("Attempting to connect to broker");
@@ -111,25 +116,25 @@ void loop() {
   
   if (!mqttClient.connected()){          //if not connectd to the broker, try to connect:
     Serial.println("reconnecting");
-    digitalWrite(brokerLedPin, LOW);
-    digitalWrite(errorLedPin, HIGH);
     connectToBroker();
-  }else{
-    digitalWrite(brokerLedPin, HIGH);
-    digitalWrite(errorLedPin, LOW);
   }
-
-
+  
+  //Sent timer to MQTT broker:
+   if (millis() - lastMillis > 1000) {
+    lastMillis = millis();
+    mqttClient.beginMessage(topic);
+    mqttClient.print(random(randomNum));
+    mqttClient.endMessage();
+  }
   
   //Sent sumState to MQTT broker:
   
   if (sumState == HIGH) {
       Serial.println("open!");
       mqttClient.beginMessage(topic);
-      mqttClient.print(1);
+      mqttClient.print(random(randomNum+10, randomNum+20));
       mqttClient.endMessage();
-  }
-
+  } 
 }
 
 
@@ -185,16 +190,22 @@ boolean connectToBroker(){
   if (!mqttClient.connect(broker, port)){
     Serial.print("MQTT connection failed. Error no: ");
     Serial.println(mqttClient.connectError());
+    digitalWrite(brokerLedPin, LOW);
+    digitalWrite(errorLedPin, HIGH);
     
     return false;
   }
 
   //once you're connected, process...
   mqttClient.subscribe(topic);
+  digitalWrite(brokerLedPin, HIGH);
+  digitalWrite(errorLedPin, LOW);
 
 
   return true;
 }
+
+
 
 void checkWifiConnection(){
     while (WiFi.status() != WL_CONNECTED) {

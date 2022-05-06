@@ -21,20 +21,22 @@ MqttClient mqttClient(wifi);
 //detials for MQTT client:
 char broker[] = "public.cloud.shiftr.io";
 int port = 1883;
-char topic[] = "linkingDoggo";
+char topic[] = "doggolinko";
 char clientID[] = "servoClient";
 
 
 const int servoPin = 2;
 
-const int wifiLedPin = 3;           // wifi connected led indicator
+const int wifiLedPin = 7;           // wifi connected led indicator
 const int brokerLedPin = 4;           // mqtt broker connected led indicator
 const int errorLedPin = 5;
+const int dataInLedPin = 6;
 
 Servo myservo;
-float servoAngle = 180;
-const int openAngle = 80;      //should be 90 degree. However,each servo might be different
-float closingSpeed = -0.01;      //the decreasing angle of each loop
+float servoAngle = 43;
+const int closeAngle = 43;
+const int openAngle = 147;      //should be 90 degree. However,each servo might be different
+float closingSpeed = 0.001;      //the decreasing angle of each loop
                   
 
 unsigned long lastTimer;    //the previous time sumState was HIGH
@@ -42,27 +44,33 @@ unsigned long waitingTime = 5000;  //stay open for certain milliseconds
 
 int sumState;
 
+int randomNum = 10;
+unsigned long lastMillis = 0;
+
 
 void setup() {
   pinMode(wifiLedPin, OUTPUT); 
   pinMode(brokerLedPin, OUTPUT);      
   pinMode(errorLedPin, OUTPUT); 
+  pinMode(dataInLedPin, OUTPUT);
   myservo.attach(servoPin);
 
   digitalWrite(wifiLedPin, LOW);
   digitalWrite(brokerLedPin, LOW);
   digitalWrite(errorLedPin, LOW);
+  digitalWrite(dataInLedPin, LOW);
 
   Serial.begin(9600);                 // initialize serial
  
-//  while (!Serial);
 
-  checkWifiConnection();
 
   mqttClient.setId(clientID);
   mqttClient.setUsernamePassword(SECRET_MQTT_USER, SECRET_MQTT_PASS);
 
-  while (!connectToBroker()) {
+
+  connectToBroker();
+
+  while (!connectToBroker()){
     Serial.println("Attempting to connect to broker");
     delay(1000);
   }
@@ -71,19 +79,15 @@ void setup() {
   digitalWrite(brokerLedPin, HIGH);
 }
 
+
+
 void loop() {
   //MQTT connection:
     
   if (!mqttClient.connected()){       //if not connectd to the broker, try to connect
     Serial.println("reconnecting");
-    digitalWrite(brokerLedPin, LOW);
-    digitalWrite(errorLedPin, HIGH);
     connectToBroker();
-  }else{
-    digitalWrite(brokerLedPin, HIGH);
-    digitalWrite(errorLedPin, LOW);
   }
-
   
   if (mqttClient.parseMessage() > 0){
     Serial.print("Got a message on topic: ");
@@ -94,11 +98,18 @@ void loop() {
       Serial.println(message);
 
       if (message > 0){
-        sumState = HIGH;
-      } 
-       
-      
+        lastMillis = millis();
+        if(message > randomNum){
+          sumState = HIGH;
+        }
+      }
     }
+  }
+
+  if (millis() - lastMillis > 10000) { //Didn't receive any message within 10 sec
+    digitalWrite(dataInLedPin, LOW);
+  } else {
+    digitalWrite(dataInLedPin, HIGH);
   }
 
   
@@ -110,10 +121,10 @@ void loop() {
   }
 
   if ((millis() - lastTimer) > waitingTime) {
-    if (servoAngle < 180) {
+    if (servoAngle > closeAngle) {
       servoAngle -= closingSpeed;
     } else {
-      servoAngle = 180;
+      servoAngle = closeAngle;
     }
   }
 
@@ -135,12 +146,15 @@ boolean connectToBroker(){
   if (!mqttClient.connect(broker, port)){
     Serial.print("MQTT connection failed. Error no: ");
     Serial.println(mqttClient.connectError());
-
+    digitalWrite(brokerLedPin, LOW);
+    
     return false;
   }
 
   //once you're connected, process...
   mqttClient.subscribe(topic);
+  digitalWrite(brokerLedPin, HIGH);
+
 
   return true;
 }
